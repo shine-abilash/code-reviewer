@@ -176,7 +176,7 @@ def _repository_path(payload: dict[str, Any]) -> str:
     if candidate:
         return str(candidate)
 
-    root = os.getenv("GITHUB_REPOSITORY_ROOT", "")
+    root = os.getenv("GITHUB_REPOSITORY_ROOT", settings.github_repository_root)
     full_name = str(repository.get("full_name") or "")
     if root and full_name:
         # Only use the final repository component; never allow payload path

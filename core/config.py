@@ -31,6 +31,7 @@ class Settings(BaseSettings):
 
     # GitHub webhook
     github_webhook_secret: str = ""
+    github_repository_root: str = ""
 
     # Sandbox / auto-debug loop
     sandbox_image: str = "python:3.12-slim"
