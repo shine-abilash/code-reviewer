@@ -17,7 +17,7 @@ from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Header, HTTPException, Request, status
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from agents.manager_agent import ReviewTask, build_review_plan
@@ -187,6 +187,15 @@ def _repository_path(payload: dict[str, Any]) -> str:
     raise ValueError("payload must identify a checked-out repository via repo_path or repository.local_path")
 
 
+def _run_webhook_review(repo_path: str, before: str, after: str, delivery_id: str) -> None:
+    """Run a webhook review outside the request so GitHub gets a fast ACK."""
+    try:
+        result = run_review_pipeline(repo_path, before, after)
+        logger.info("GitHub review completed for delivery %s: %s", delivery_id, result["status"])
+    except Exception:
+        logger.exception("GitHub review failed for delivery %s", delivery_id)
+
+
 @app.get("/health")
 def health() -> dict[str, Any]:
     return {
@@ -208,6 +217,7 @@ def manual_review(request: ReviewRequest) -> dict[str, Any]:
 @app.post("/webhook/github")
 async def github_webhook(
     request: Request,
+    background_tasks: BackgroundTasks,
     x_hub_signature_256: str | None = Header(default=None),
     x_github_event: str | None = Header(default=None),
     x_github_delivery: str | None = Header(default=None),
@@ -247,14 +257,13 @@ async def github_webhook(
 
     try:
         repo_path = _repository_path(payload)
-        result = run_review_pipeline(repo_path, before, after)
+        if not Path(repo_path).is_dir():
+            raise ValueError(f"checked-out repository does not exist: {repo_path}")
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as exc:
-        logger.exception("GitHub webhook review failed")
-        raise HTTPException(status_code=500, detail=f"Webhook review failed: {exc}") from exc
 
-    return {"status": "accepted", "delivery_id": delivery_id or None, "review": result}
+    background_tasks.add_task(_run_webhook_review, repo_path, before, after, delivery_id)
+    return {"status": "accepted", "delivery_id": delivery_id or None}
 
 
 # Convenient import target for ``uvicorn api.main:app``.
