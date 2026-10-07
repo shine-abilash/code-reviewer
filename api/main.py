@@ -225,6 +225,12 @@ async def github_webhook(
         raise HTTPException(status_code=400, detail="Webhook payload must be a JSON object")
 
     event = (x_github_event or payload.get("hook", {}).get("event") or "").lower()
+    if event == "ping":
+        return {
+            "status": "ok",
+            "event": "ping",
+            "delivery_id": x_github_delivery or payload.get("zen"),
+        }
     if event != "push":
         raise HTTPException(status_code=400, detail=f"Unsupported GitHub event: {event or 'missing'}")
     after = payload.get("after")
