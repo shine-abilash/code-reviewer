@@ -1,0 +1,37 @@
+# --- Multi-agent orchestration ---
+# NOTE: crewai's telemetry module still imports pkg_resources, which newer
+# setuptools versions dropped. Pin setuptools<81 to keep it working.
+setuptools<81
+crewai==0.86.0
+crewai-tools==0.17.0
+
+# --- LLM access: local Ollama + cloud fallback ---
+langchain-ollama==0.2.1
+langchain-groq==0.2.1
+ollama==0.4.4
+
+# --- Backend / webhook server ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-dotenv==1.0.1
+pydantic==2.10.2
+
+# --- Git handling ---
+GitPython==3.1.43
+unidiff==0.7.5
+
+# --- Sandboxed auto-debug loop ---
+docker==7.1.0
+
+# --- RAG / vector store ---
+qdrant-client[fastembed]==1.12.1
+
+# --- Static analysis helpers (feed real signal to agents, not just LLM guesses) ---
+bandit==1.8.0        # security static analysis for Python
+radon==6.0.1          # complexity metrics
+ruff==0.8.3           # fast style/lint checks
+
+# --- Testing ---
+pytest==8.3.4
+httpx==0.27.2
+groq==0.13.1
