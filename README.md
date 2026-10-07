@@ -65,6 +65,7 @@ The project uses local Qdrant-on-disk mode by default. An external Qdrant server
 | `GROQ_API_KEY` | Optional cloud fallback credential | empty |
 | `GROQ_MODEL` | Groq model | `llama-3.3-70b-versatile` |
 | `ROUTING_MODE` | `auto`, `local`, or `cloud` | `auto` |
+| `LLM_TIMEOUT_SECONDS` | Maximum duration of one model request | `90` |
 | `QDRANT_MODE` | `local` or `server` | `local` |
 | `QDRANT_PATH` | Local Qdrant data directory | `./qdrant_data` |
 | `QDRANT_URL` | Qdrant server URL | `http://localhost:6333` |

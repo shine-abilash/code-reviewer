@@ -31,7 +31,10 @@ def call_local_llm_json(system_prompt: str, user_prompt: str) -> dict:
     Returns the parsed dict. Raises LLMResponseError if the model's output
     isn't valid JSON at all (rare with format="json", but not impossible).
     """
-    client = ollama.Client(host=settings.ollama_base_url)
+    client = ollama.Client(
+        host=settings.ollama_base_url,
+        timeout=settings.llm_timeout_seconds,
+    )
 
     response = client.chat(
         model=settings.ollama_model,
@@ -65,7 +68,11 @@ def call_cloud_llm_json(system_prompt: str, user_prompt: str) -> dict:
     if not settings.groq_api_key:
         raise LLMResponseError("GROQ_API_KEY is not set in .env -- cannot call cloud model.")
 
-    client = Groq(api_key=settings.groq_api_key)
+    client = Groq(
+        api_key=settings.groq_api_key,
+        timeout=settings.llm_timeout_seconds,
+        max_retries=0,
+    )
 
     response = client.chat.completions.create(
         model=settings.groq_model,

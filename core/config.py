@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     # Routing behavior: auto | local | cloud
     routing_mode: str = "auto"
 
+    # Bound model calls so a slow/unavailable backend cannot block an API
+    # request indefinitely.
+    llm_timeout_seconds: float = 90.0
+
     # Vector DB
     qdrant_mode: str = "local"
     qdrant_path: str = "./qdrant_data"
