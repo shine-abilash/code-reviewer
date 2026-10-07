@@ -6,7 +6,7 @@ import sqlite3
 
 
 DB_PATH = "users.db"
-STRIPE_API_KEY = "DEMO_STRIPE_KEY_NOT_REAL"
+STRIPE_API_KEY = "sk_live_1234567890abcdef"
 
 def get_connection():
     return sqlite3.connect(DB_PATH)

@@ -78,7 +78,9 @@ def parse_commit_range(repo_path: str, base_ref: str = "HEAD~1", head_ref: str =
     base_commit = repo.commit(base_ref)
     head_commit = repo.commit(head_ref)
 
-    diff_text = repo.git.diff(base_commit.hexsha, head_commit.hexsha)
+    # A caller's global color.ui=always must not inject ANSI escapes into the
+    # machine-readable patch consumed by unidiff.
+    diff_text = repo.git.diff(base_commit.hexsha, head_commit.hexsha, color="never")
 
     patch_set = PatchSet(diff_text)
 
