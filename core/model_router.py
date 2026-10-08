@@ -91,7 +91,12 @@ def route_llm_call(
         "cloud": call_cloud_llm_json,
     }
 
-    for backend_name in (primary, secondary):
+    if settings.routing_mode in {"local", "cloud"}:
+        backends_to_try = (primary,)
+    else:
+        backends_to_try = (primary, secondary)
+
+    for backend_name in backends_to_try:
         call_fn = backends[backend_name]
         try:
             response = call_fn(system_prompt, user_prompt)
